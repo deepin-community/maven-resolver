@@ -14,15 +14,18 @@
 # from the POM
 #   junit junit jar s/3\\..*/3.x/
 
+biz.aQute.bnd bnd-maven-plugin * * * *
 ch.qos.logback logback-classic * * * *
 org.apache.maven.plugins maven-enforcer-plugin * * * *
 org.apache.maven.plugins maven-gpg-plugin * * * *
 org.apache.maven.plugins maven-javadoc-plugin * * * *
+org.apache.maven.plugins maven-jar-plugin * * * *
 org.apache.maven.plugins maven-site-plugin * * * *
 org.apache.maven.wagon wagon-http-lightweight * * * *
 org.apache.rat apache-rat-plugin * * * *
 org.codehaus.mojo animal-sniffer-maven-plugin * * * *
 org.codehaus.mojo clirr-maven-plugin * * * *
+org.eclipse.jetty jetty-http * * * *
 org.eclipse.jetty jetty-server * * * *
 org.eclipse.jetty jetty-servlet * * * *
 org.eclipse.jetty jetty-util * * * *

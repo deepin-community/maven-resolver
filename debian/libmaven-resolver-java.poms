@@ -37,3 +37,5 @@ maven-resolver-transport-classpath/pom.xml --has-package-version
 maven-resolver-transport-file/pom.xml --has-package-version
 maven-resolver-transport-http/pom.xml --has-package-version --package=libmaven-resolver-transport-http-java
 maven-resolver-transport-wagon/pom.xml --has-package-version
+maven-resolver-synccontext-global/pom.xml --ignore
+maven-resolver-synccontext-redisson/pom.xml --ignore
