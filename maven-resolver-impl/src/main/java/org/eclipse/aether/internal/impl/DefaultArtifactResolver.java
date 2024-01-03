@@ -353,6 +353,7 @@ public class DefaultArtifactResolver
                 LOGGER.debug( "Verifying availability of {} from {}", local.getFile(), repos );
             }
 
+            LOGGER.debug( "Resolving artifact {} from {}", artifact, repos );
             AtomicBoolean resolved = new AtomicBoolean( false );
             Iterator<ResolutionGroup> groupIt = groups.iterator();
             for ( RemoteRepository repo : repos )
@@ -493,6 +494,20 @@ public class DefaultArtifactResolver
 
         try
         {
+            RemoteRepository repo = group.repository;
+            if ( repo.isBlocked() )
+            {
+                if ( repo.getMirroredRepositories().isEmpty() )
+                {
+                    throw new NoRepositoryConnectorException( repo, "Blocked repository: " + repo );
+                }
+                else
+                {
+                    throw new NoRepositoryConnectorException( repo, "Blocked mirror for repositories: "
+                        + repo.getMirroredRepositories() );
+                }
+            }
+
             try ( RepositoryConnector connector =
                           repositoryConnectorProvider.newRepositoryConnector( session, group.repository ) )
             {

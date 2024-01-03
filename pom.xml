@@ -30,7 +30,7 @@
 
   <groupId>org.apache.maven.resolver</groupId>
   <artifactId>maven-resolver</artifactId>
-  <version>1.4.2</version>
+  <version>1.6.3</version>
   <packaging>pom</packaging>
 
   <name>Maven Artifact Resolver</name>
@@ -50,7 +50,7 @@
     <connection>scm:git:https://gitbox.apache.org/repos/asf/maven-resolver.git</connection>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven-resolver.git</developerConnection>
     <url>https://github.com/apache/maven-resolver/tree/${project.scm.tag}</url>
-    <tag>maven-resolver-1.4.2</tag>
+    <tag>maven-resolver-1.6.3</tag>
   </scm>
   <issueManagement>
     <system>jira</system>
@@ -58,7 +58,7 @@
   </issueManagement>
   <ciManagement>
     <system>Jenkins</system>
-    <url>https://builds.apache.org/job/maven-box/job/maven-resolver/</url>
+    <url>https://ci-builds.apache.org/job/Maven/job/maven-box/job/maven-resolver/</url>
   </ciManagement>
   <distributionManagement>
     <site>
@@ -72,9 +72,9 @@
     <surefire.redirectTestOutputToFile>true</surefire.redirectTestOutputToFile>
     <maven.site.path>resolver-archives/resolver-LATEST</maven.site.path>
     <checkstyle.violation.ignore>None</checkstyle.violation.ignore>
-    <sisuVersion>0.3.3</sisuVersion>
-    <slf4jVersion>1.7.25</slf4jVersion>
-    <project.build.outputTimestamp>2020-04-24T12:25:33Z</project.build.outputTimestamp>
+    <sisuVersion>0.3.4</sisuVersion>
+    <slf4jVersion>1.7.30</slf4jVersion>
+    <project.build.outputTimestamp>2021-05-04T13:03:34Z</project.build.outputTimestamp>
   </properties>
 
   <modules>
@@ -149,19 +149,19 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.12</version>
+        <version>4.13</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.hamcrest</groupId>
         <artifactId>hamcrest-core</artifactId>
-        <version>1.3</version>
+        <version>2.2</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>2.23.0</version>
+        <version>2.28.2</version>
         <scope>test</scope>
       </dependency>
 
@@ -230,7 +230,7 @@
             <linksource>true</linksource>
             <notimestamp>true</notimestamp>
             <links>
-              <link>http://download.oracle.com/javase/6/docs/api/</link>
+              <link>https://download.oracle.com/javase/${javaVersion}/docs/api/</link>
             </links>
             <tags>
               <tag>
@@ -349,26 +349,24 @@
           </configuration>
         </plugin>
         <plugin>
-          <groupId>org.apache.felix</groupId>
-          <artifactId>maven-bundle-plugin</artifactId>
-          <version>3.5.0</version>
-          <configuration>
-            <manifestLocation>${project.build.directory}/osgi</manifestLocation>
-            <instructions>
-              <Bundle-SymbolicName>${Bundle-SymbolicName}</Bundle-SymbolicName>
-              <Bundle-DocURL>${project.url}</Bundle-DocURL>
-              <_removeheaders>Bnd-LastModified,Include-Resource</_removeheaders>
-              <!-- Export all packages except those with "internal" in their names -->
-              <_exportcontents>!*internal*,*</_exportcontents>
-            </instructions>
-          </configuration>
+          <groupId>biz.aQute.bnd</groupId>
+          <artifactId>bnd-maven-plugin</artifactId>
+          <version>5.1.2</version>
           <executions>
             <execution>
-              <id>bundle-manifest</id>
-              <phase>process-classes</phase>
+              <id>bnd-process</id>
               <goals>
-                <goal>manifest</goal>
+                <goal>bnd-process</goal>
               </goals>
+              <configuration>
+                <bnd>
+                  Bundle-SymbolicName: ${Bundle-SymbolicName}
+                  # Export packages not containing the substring 'internal'
+                  -exportcontents: ${removeall;${packages};${packages;NAMED;*internal*}}
+                  # Reproducible build
+                  -noextraheaders: true
+                </bnd>
+              </configuration>
             </execution>
           </executions>
         </plugin>
@@ -385,6 +383,27 @@
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>enforce-minimum-java-version</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireJavaVersion>
+                  <version>1.8.0</version><!-- for bnd-maven-plugin -->
+                </requireJavaVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
 
   <profiles>
@@ -487,7 +506,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-enforcer-plugin</artifactId>
-            <version>3.0.0-M2</version>
+            <version>3.0.0-M3</version>
             <executions>
               <execution>
                 <id>enforce-java</id>
@@ -500,13 +519,23 @@
                       <version>(,9)</version>
                       <message>Release with Java 7 or 8 due to changed signatures of java.nio.ByteBuffer (MRESOLVER-67)</message>
                     </requireJavaVersion>
-                  </rules>    
+                  </rules>
                 </configuration>
               </execution>
             </executions>
           </plugin>
         </plugins>
       </build>
+    </profile>
+    <profile>
+      <id>java8-modules</id>
+      <activation>
+        <jdk>[1.8,)</jdk>
+      </activation>
+      <modules>
+        <module>maven-resolver-synccontext-global</module>
+        <module>maven-resolver-synccontext-redisson</module>
+      </modules>
     </profile>
   </profiles>
 </project>

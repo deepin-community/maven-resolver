@@ -1,1 +1,11 @@
-.pc/
+target/
+.project
+.classpath
+.settings/
+.idea
+*.iml
+*.ipr
+*.iws
+pom.xml.versionsBackup
+.checkstyle
+

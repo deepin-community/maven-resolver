@@ -1,3 +1,13 @@
+maven-resolver (1.6.3-1) unstable; urgency=medium
+
+  * New upstream release
+    - New dependency on libcommons-lang3-java
+    - Ignore the new synccontext modules
+    - No longer generate the OSGi metadata (requires bnd-maven-plugin)
+  * Standards-Version updated to 4.6.0.1
+
+ -- Emmanuel Bourg <ebourg@apache.org>  Wed, 04 May 2022 09:48:42 +0200
+
 maven-resolver (1.4.2-3) unstable; urgency=medium
 
   * Depend on guice instead of sisu-guice (Closes: #982708)
